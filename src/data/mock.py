@@ -1,0 +1,4 @@
+MOCK_USERS = [
+    {"id": 1, "name": "Alice", "role": "admin"},
+    {"id": 2, "name": "Bob", "role": "user"},
+]
