@@ -1,2 +1,5 @@
 Flask
 flasgger
+SQLAlchemy
+psycopg2
+python-dotenv

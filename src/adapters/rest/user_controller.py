@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from data.mock import MOCK_USERS
+from services.user_service import get_all_users, get_user_by_id, create_user as service_create_user, update_user as service_update_user
 
 user_bp = Blueprint('user', __name__)
 
@@ -20,10 +20,11 @@ def get_users():
                 type: integer
               name:
                 type: string
-              role:
+              email:
                 type: string
     """
-    return jsonify(MOCK_USERS)
+    users = get_all_users()
+    return jsonify(users)
 
 @user_bp.route('/<int:user_id>', methods=['GET'])
 def get_user(user_id):
@@ -46,7 +47,7 @@ def get_user(user_id):
               type: integer
             name:
               type: string
-            role:
+            email:
               type: string
       404:
         description: User not found.
@@ -56,13 +57,13 @@ def get_user(user_id):
             error:
               type: string
     """
-    user = next((user for user in MOCK_USERS if user['id'] == user_id), None)
-    if user is None:
+    user_serialized = get_user_by_id(user_id)
+    if user_serialized is None:
         return jsonify({'error': 'User not found'}), 404
-    return jsonify(user)
+    return jsonify(user_serialized)
 
 @user_bp.route('/', methods=['POST'])
-def create_user():
+def create_user_endpoint():
     """
     Create a new user.
     ---
@@ -75,11 +76,11 @@ def create_user():
           properties:
             name:
               type: string
-            role:
+            email:
               type: string
           required:
             - name
-            - role
+            - email
     responses:
       201:
         description: User created successfully.
@@ -90,20 +91,17 @@ def create_user():
               type: integer
             name:
               type: string
-            role:
+            email:
               type: string
     """
     data = request.json
-    new_user = {
-        'id': len(MOCK_USERS) + 1,
-        'name': data.get('name'),
-        'role': data.get('role')
-    }
-    MOCK_USERS.append(new_user)
-    return jsonify(new_user), 201
+    name = data.get('name')
+    email = data.get('email')
+    new_user_serialized = service_create_user(name, email)
+    return jsonify(new_user_serialized), 201
 
 @user_bp.route('/<int:user_id>', methods=['PUT'])
-def update_user(user_id):
+def update_user_endpoint(user_id):
     """
     Update an existing user.
     ---
@@ -121,7 +119,7 @@ def update_user(user_id):
           properties:
             name:
               type: string
-            role:
+            email:
               type: string
     responses:
       200:
@@ -133,7 +131,7 @@ def update_user(user_id):
               type: integer
             name:
               type: string
-            role:
+            email:
               type: string
       404:
         description: User not found.
@@ -144,9 +142,9 @@ def update_user(user_id):
               type: string
     """
     data = request.json
-    user = next((user for user in MOCK_USERS if user['id'] == user_id), None)
-    if user is None:
+    name = data.get('name')
+    email = data.get('email')
+    updated_user_serialized = service_update_user(user_id, name, email)
+    if updated_user_serialized is None:
         return jsonify({'error': 'User not found'}), 404
-    user['name'] = data.get('name', user['name'])
-    user['role'] = data.get('role', user['role'])
-    return jsonify(user)
+    return jsonify(updated_user_serialized)
