@@ -1,6 +1,7 @@
 from flask import Flask
 from adapters.rest.user_controller import user_bp
 from flasgger import Swagger
+from database.db import create_tables
 
 app  = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -13,4 +14,5 @@ swagger = Swagger(app)
 app.register_blueprint(user_bp, url_prefix='/users')
 
 if __name__ == '__main__':
+    create_tables()
     app.run(debug=True)
