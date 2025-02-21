@@ -1,10 +1,20 @@
-from flask import Blueprint, request, jsonify
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from services.user_service import get_all_users, get_user_by_id, create_user as service_create_user, update_user as service_update_user
 
-user_bp = Blueprint('user', __name__)
+router = APIRouter()
 
-@user_bp.route('/', methods=['GET'])
-def get_users():
+class User(BaseModel):
+    id: int
+    name: str
+    email: str
+
+class UserCreate(BaseModel):
+    name: str
+    email: str
+
+@router.get("/", response_model=list[User])
+async def get_users():
     """
     Retrieve a list of all users.
     ---
@@ -23,11 +33,11 @@ def get_users():
               email:
                 type: string
     """
-    users = get_all_users()
-    return jsonify(users)
+    users = await get_all_users()
+    return users
 
-@user_bp.route('/<int:user_id>', methods=['GET'])
-def get_user(user_id):
+@router.get("/{user_id}", response_model=User)
+async def get_user(user_id: int):
     """
     Retrieve a user by ID.
     ---
@@ -57,13 +67,13 @@ def get_user(user_id):
             error:
               type: string
     """
-    user_serialized = get_user_by_id(user_id)
+    user_serialized = await get_user_by_id(user_id)
     if user_serialized is None:
-        return jsonify({'error': 'User not found'}), 404
-    return jsonify(user_serialized)
+        raise HTTPException(status_code=404, detail="User not found")
+    return user_serialized
 
-@user_bp.route('/', methods=['POST'])
-def create_user_endpoint():
+@router.post("/", response_model=User, status_code=201)
+async def create_user_endpoint(user: UserCreate):
     """
     Create a new user.
     ---
@@ -94,14 +104,11 @@ def create_user_endpoint():
             email:
               type: string
     """
-    data = request.json
-    name = data.get('name')
-    email = data.get('email')
-    new_user_serialized = service_create_user(name, email)
-    return jsonify(new_user_serialized), 201
+    new_user_serialized = await service_create_user(user.name, user.email)
+    return new_user_serialized
 
-@user_bp.route('/<int:user_id>', methods=['PUT'])
-def update_user_endpoint(user_id):
+@router.put("/{user_id}", response_model=User)
+async def update_user_endpoint(user_id: int, user: UserCreate):
     """
     Update an existing user.
     ---
@@ -141,10 +148,7 @@ def update_user_endpoint(user_id):
             error:
               type: string
     """
-    data = request.json
-    name = data.get('name')
-    email = data.get('email')
-    updated_user_serialized = service_update_user(user_id, name, email)
+    updated_user_serialized = await service_update_user(user_id, user.name, user.email)
     if updated_user_serialized is None:
-        return jsonify({'error': 'User not found'}), 404
-    return jsonify(updated_user_serialized)
+        raise HTTPException(status_code=404, detail="User not found")
+    return updated_user_serialized

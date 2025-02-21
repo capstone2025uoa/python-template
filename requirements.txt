@@ -1,5 +1,7 @@
-Flask
+fastapi
 flasgger
 SQLAlchemy
-psycopg2
+asyncpg
 python-dotenv
+uvicorn
+greenlet
