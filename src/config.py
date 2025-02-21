@@ -3,4 +3,5 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.environ.get("DATABASE_URL") 
+READER_DATABASE_URL = os.environ.get("READER_DATABASE_URL") 
+WRITER_DATABASE_URL = os.environ.get("WRITER_DATABASE_URL") 

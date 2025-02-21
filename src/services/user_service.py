@@ -1,12 +1,9 @@
 from data_access.user_repo import UserRepository
-from database.db import connect_to_database
-from config import DATABASE_URL
-
-SessionLocal = connect_to_database(DATABASE_URL)
+from database.db import get_session
 
 
 def get_all_users():
-    db = SessionLocal()
+    db = get_session(read_only=True)
     try:
         user_repo = UserRepository(db)
         users = user_repo.list_users()
@@ -16,7 +13,7 @@ def get_all_users():
 
 
 def get_user_by_id(user_id):
-    db = SessionLocal()
+    db = get_session(read_only=True)
     try:
         user_repo = UserRepository(db)
         user_obj = user_repo.get_user_by_id(user_id)
@@ -28,7 +25,7 @@ def get_user_by_id(user_id):
 
 
 def create_user(name, email):
-    db = SessionLocal()
+    db = get_session(read_only=False)
     try:
         user_repo = UserRepository(db)
         new_user_obj = user_repo.create_user(name, email)
@@ -38,7 +35,7 @@ def create_user(name, email):
 
 
 def update_user(user_id, name, email):
-    db = SessionLocal()
+    db = get_session(read_only=False)
     try:
         user_repo = UserRepository(db)
         updated_user_obj = user_repo.update_user(user_id, name, email)
