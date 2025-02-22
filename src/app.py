@@ -4,12 +4,22 @@ from adapters.rest.user_controller import router as user_bp
 from database.db import create_tables
 import asyncio
 from contextlib import asynccontextmanager
+from adapters.grpc.server.grpc_server import serve_grpc
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """ background task starts at startup """
     asyncio.create_task(create_tables())
+
+    grpc_task = asyncio.create_task(serve_grpc())
+
     yield
+
+    grpc_task.cancel()
+    try:
+        await grpc_task
+    except asyncio.CancelledError:
+        print("gRPC server cancelled.")
 
 app = FastAPI(lifespan=lifespan)
 
