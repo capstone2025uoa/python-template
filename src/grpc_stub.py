@@ -1,7 +1,5 @@
 import grpc
-from adapters.grpc.proto.greeting import greeter_pb2
-from adapters.grpc.proto.greeting import greeter_pb2_grpc
-from adapters.grpc.proto.user import user_pb2, user_pb2_grpc
+from compsci399_grpc import greeter_pb2, greeter_pb2_grpc, user_pb2, user_pb2_grpc
 
 def run():
     channel = grpc.insecure_channel('localhost:50051')
@@ -10,7 +8,7 @@ def run():
 
     channel = grpc.insecure_channel('localhost:50051')
     stub = user_pb2_grpc.UserStub(channel)
-    response = stub.GetUser(user_pb2.GetUserRequest(id='1'))
+    response = stub.GetUser(user_pb2.GetUserRequest(id=1))
     print(response.name)
 
 if __name__ == '__main__':

@@ -2,10 +2,9 @@
 import asyncio
 import grpc
 from grpc.experimental import aio as grpc_aio  # Async gRPC server module
-from adapters.grpc.proto.greeting import greeter_pb2
-from adapters.grpc.proto.greeting import greeter_pb2_grpc
+from compsci399_grpc import greeter_pb2, greeter_pb2_grpc
 from adapters.grpc.proto.greeting.servicer import GreeterServicer
-from adapters.grpc.proto.user import user_pb2_grpc
+from compsci399_grpc import user_pb2_grpc
 from adapters.grpc.proto.user.servicer import UserServicer
 
 async def serve_grpc():

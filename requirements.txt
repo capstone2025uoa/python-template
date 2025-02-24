@@ -7,3 +7,4 @@ uvicorn
 greenlet
 grpcio
 grpcio-tools
+git+https://github.com/capstone2025uoa/grpc.git
