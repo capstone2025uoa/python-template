@@ -26,7 +26,6 @@ async def serve_grpc():
     logging.info(f"gRPC server started on {GRPC_SERVER_ADDR}")
     
     # Keep the server running indefinitely
-    logging.info("gRPC server is now waiting for termination...")
     await server.wait_for_termination()
 
 if __name__ == '__main__':
