@@ -15,7 +15,7 @@ jobs:
       REPO_NAME: python-template
       SERVICE_NAME: python-template-service
       CLUSTER_NAME: python-template-cluster
-
+      AWS_ECS_TASK_DEFINITION_CONTAINER_NAME: python-template-container
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -55,3 +55,19 @@ jobs:
           docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$REPO_NAME:${IMAGE_TAG}
           docker push $ECR_REGISTRY/$REPO_NAME:${IMAGE_TAG}
           echo "image=$ECR_REGISTRY/$REPO_NAME:${IMAGE_TAG}" >> $GITHUB_OUTPUT 
+    
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@master
+        with:
+          task-definition: TaskDefinition.json
+          container-name: ${{env.AWS_ECS_TASK_DEFINITION_CONTAINER_NAME}}
+          image: ${{ steps.build-image.outputs.image }}
+      
+      - name: Deploy to Amazon ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+          service: ${{ env.SERVICE_NAME }}
+          cluster: ${{ env.CLUSTER_NAME }}
+          wait-for-service-stability: false

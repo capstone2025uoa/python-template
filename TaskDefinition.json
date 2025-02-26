@@ -1,0 +1,92 @@
+{
+    "containerDefinitions": [
+      {
+        "name": "python-template-container",
+        "image": "343218181976.dkr.ecr.ap-southeast-2.amazonaws.com/python-template",
+        "cpu": 0,
+        "portMappings": [
+          {
+            "name": "restful",
+            "containerPort": 3000,
+            "hostPort": 3000,
+            "protocol": "tcp",
+            "appProtocol": "http"
+          },
+          {
+            "name": "grpc",
+            "containerPort": 50021,
+            "hostPort": 50021,
+            "protocol": "tcp",
+            "appProtocol": "grpc"
+          }
+        ],
+        "essential": true,
+        "environment": [
+          {
+            "name": "SQS_QUEUE_URL",
+            "value": "https://sqs.ap-southeast-2.amazonaws.com/343218181976/template-sqs"
+          },
+          {
+            "name": "WRITER_DATABASE_URL",
+            "value": "postgresql+asyncpg://postgres:zhufeng716@postgres-cluster-template.cluster-c5gokgmq8dvj.ap-southeast-2.rds.amazonaws.com:5432/postgres"
+          },
+          {
+            "name": "READER_DATABASE_URL",
+            "value": "postgresql+asyncpg://postgres:zhufeng716@postgres-cluster-template.cluster-ro-c5gokgmq8dvj.ap-southeast-2.rds.amazonaws.com:5432/postgres"
+          },
+          {
+            "name": "GRPC_SERVER_PORT",
+            "value": "50051"
+          },
+          {
+            "name": "SQS_REGION",
+            "value": "ap-southeast-2"
+          },
+          {
+            "name": "GRPC_SERVER_HOST",
+            "value": "::"
+          }
+        ],
+        "environmentFiles": [],
+        "mountPoints": [],
+        "volumesFrom": [],
+        "ulimits": [],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/ecs/python-template",
+            "mode": "non-blocking",
+            "awslogs-create-group": "true",
+            "max-buffer-size": "25m",
+            "awslogs-region": "ap-southeast-2",
+            "awslogs-stream-prefix": "ecs"
+          },
+          "secretOptions": []
+        },
+        "systemControls": []
+      }
+    ],
+    "family": "python-template",
+    "taskRoleArn": "arn:aws:iam::343218181976:role/ecs-sqs-sns-s3-role",
+    "executionRoleArn": "arn:aws:iam::343218181976:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "volumes": [],
+    "placementConstraints": [],
+    "runtimePlatform": {
+      "cpuArchitecture": "X86_64",
+      "operatingSystemFamily": "LINUX"
+    },
+    "requiresCompatibilities": [
+      "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "2048",
+    "enableFaultInjection": false,
+    "tags": [
+      {
+        "key": "Project",
+        "value": "Template"
+      }
+    ]
+  }
+  
