@@ -33,7 +33,7 @@ class SQSClient:
     
     async def send_message(self, 
                        message_body: Union[str, Dict[str, Any]], 
-                       message_type: str = "template", 
+                       message_type: str, 
                        content_type: str = "application/json", 
                        queue_url: str = None, 
                        delay_seconds: int = 0) -> Dict[str, Any]:
@@ -146,17 +146,20 @@ async def example_usage():
     async with SQSClient(queue_url=queue_url, region_name=region) as sqs_client:
         # Example 1: Send a JSON message
         json_response = await sqs_client.send_json_message(
-            data={"abc": "abc"}
+            data={"abc": "abc"},
+            message_type="template"
         )
         
         # Example 2: Send a plain text message
         text_response = await sqs_client.send_text_message(
-            text="Hello, this is a plain text message"
+            text="Hello, this is a plain text message",
+            message_type="template"
         )
         
         # Example 3: Using the general send_message method
         default_response = await sqs_client.send_message(
-            message_body={"data": "Using general method"}
+            message_body={"data": "Using general method"},
+            message_type="template"
         )
 
 
