@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from services.user_service import get_all_users, get_user_by_id, create_user as service_create_user, update_user as service_update_user
+from services.user_service import UserService
 from dto.user_dto import UserDTO
 
 router = APIRouter()
+user_service = UserService()
 
 class User(BaseModel):
     id: int
@@ -34,7 +35,7 @@ async def get_users():
               email:
                 type: string
     """
-    users = await get_all_users()
+    users = await user_service.get_all_users()
     return [UserDTO(id=user.id, name=user.name, email=user.email) for user in users]
 
 @router.get("/{user_id}", response_model=UserDTO)
@@ -68,7 +69,7 @@ async def get_user(user_id: int):
             error:
               type: string
     """
-    user_serialized = await get_user_by_id(user_id)
+    user_serialized = await user_service.get_user_by_id(user_id)
     if user_serialized is None:
         raise HTTPException(status_code=404, detail="User not found")
     return UserDTO(id=user_serialized.id, name=user_serialized.name, email=user_serialized.email)
@@ -105,7 +106,7 @@ async def create_user_endpoint(user: UserCreate):
             email:
               type: string
     """
-    new_user_serialized = await service_create_user(user.name, user.email)
+    new_user_serialized = await user_service.create_user(user.name, user.email)
     return UserDTO(id=new_user_serialized.id, name=new_user_serialized.name, email=new_user_serialized.email)
 
 @router.put("/{user_id}", response_model=UserDTO)
@@ -149,7 +150,7 @@ async def update_user_endpoint(user_id: int, user: UserCreate):
             error:
               type: string
     """
-    updated_user_serialized = await service_update_user(user_id, user.name, user.email)
+    updated_user_serialized = await user_service.update_user(user_id, user.name, user.email)
     if updated_user_serialized is None:
         raise HTTPException(status_code=404, detail="User not found")
     return UserDTO(id=updated_user_serialized.id, name=updated_user_serialized.name, email=updated_user_serialized.email)
